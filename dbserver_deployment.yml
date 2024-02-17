@@ -1,0 +1,53 @@
+---
+- hosts: dbserver
+  become: yes
+  tasks:
+    - name: Import the MongoDB public GPG Key
+      ansible.builtin.apt_key:
+        url: https://www.mongodb.org/static/pgp/server-4.4.asc
+        state: present
+
+    - name: Add the MongoDB repository
+      ansible.builtin.apt_repository:
+        repo: deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntufocal/mongodb-org/4.4multiverse
+        state: present
+        update_cache: yes
+
+    - name: Install MongoDB
+      ansible.builtin.apt:
+        name: mongodb-org
+        state: present
+        update_cache: yes
+
+    - name: Start MongoDB
+      ansible.builtin.systemd:
+        name: mongod
+        state: started
+        enabled: yes
+
+    - name: Wait for MongoDB to start
+      ansible.builtin.wait_for:
+        port: 27017
+        delay: 5
+
+    - name: Create MongoDB user
+      community.mongodb.mongodb_user:
+        login_host: localhost
+        login_port: 27017
+        login_user: admin
+        login_password: admin
+        database: admin
+        name: revanth
+        password: revanth
+        roles: readWrite
+        state: present
+
+    - name: Create MongoDB database
+      community.mongodb.mongodb_database:
+        login_host: localhost
+        login_port: 27017
+        login_user: revanth
+        login_password: revanth
+        name: tripdetails
+        state: present
+...
