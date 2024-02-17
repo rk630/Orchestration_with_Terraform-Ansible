@@ -196,24 +196,75 @@ Part 2: Configuration and Deployment with Ansible
 1. Ansible Configuration:
 
    - Configure Ansible to communicate with the AWS EC2 instances.
+```
+sudo apt update
+sudo apt install openssh-server
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible
+ansible --version
+```
 
 2. Web Server Setup:
 
    - Write an Ansible playbook to install Node.js and NPM on the web server.
-
+```
+- name: Updating the server
+      shell: |
+        apt-get update -y
+        apt-get upgrade -y
+    - name: Install Node.js and NPM
+      shell: |
+        apt-get install curl -y
+        curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        apt-get install -y nodejs
+        apt-get install -y npm
+        apt-get install -y git
+    - name: Nodejs version
+      shell: |
+        node -v
+        npm -v
+```
    - Clone the MERN application repository and install dependencies.
-
+```
+    - name: Clone the MERN application repository
+      git:
+        repo: 'https://github.com/UnpredictablePrashant/TravelMemory.git'
+        dest: /home/ubuntu/TravelMemory
+```
 3. Database Server Setup:
 
    - Install and configure MongoDB on the database server using Ansible.
+   ```
+       - name: Create .env file in backend with DB Server URL and Port number
+      shell: |
+        cd /home/ubuntu/TravelMemory/backend
+        echo "MONGO_URI='mongodb+srv://krevanth630:Mongodb%402023@clusterrevan.ahkajh5.mongodb.net/Travel-memory'" >> .env
+        echo "PORT=3001" >> .env
+   ```
+![Screenshot (29)](https://github.com/rk630/Orchestration_with_Terraform-Ansible/assets/139606316/aebe3e3f-e6fa-4933-aae2-8b5249524302)
 
    - Secure the MongoDB instance and create necessary users and databases.
 
 4. Application Deployment:
 
    - Configure environment variables and start the Node.js application.
+  ```
+    - name: Install dependencies in frontend
+      shell: |
+        cd /home/ubuntu/TravelMemory/frontend
+        npm i
+```
+![Screenshot (31)](https://github.com/rk630/Orchestration_with_Terraform-Ansible/assets/139606316/e711f065-b852-495c-a53e-77b0811efb9e)
 
    - Ensure the React frontend communicates with the Express backend.
+```
+    - name: Run MERN frontend
+      shell: |
+        cd /home/ubuntu/TravelMemory/frontend
+        npm start
+```
+![Screenshot (30)](https://github.com/rk630/Orchestration_with_Terraform-Ansible/assets/139606316/098035a8-096f-429e-a2d0-1ab1b12a8f68)
 
 5. Security Hardening:
 
